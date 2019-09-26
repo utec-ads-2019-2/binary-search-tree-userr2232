@@ -4,7 +4,7 @@ void Tester::execute() {
     Mocker mocker;
 
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
-        unsigned int size = mocker.generateRandomInt(10);
+        unsigned int size = (mocker.generateRandomInt(10)%10)+1;
         int* elements = mocker.generateRandomArray<int>(size);
         testBSFTree<int>(mocker, vector<int>(elements, elements + size));
     }
@@ -19,27 +19,39 @@ void Tester::testBSFTree(Mocker mocker, vector<T> elements) {
     }
 
     sortAndPrune(elements);
-
     ASSERT(elements.size() == test->size(), "There is a problem with the insert or size");
 
     unsigned int toRemove = mocker.generateRandomInt(1, elements.size());
-    for (int j = 0; j < toRemove; ++j) {
+    for (int j = 0; j < static_cast<int>(toRemove); ++j) {
         unsigned int index = mocker.generateRandomInt(0, elements.size() - 1);
         T temp = elements.at(index);
         elements.erase(elements.begin() + index);
+        int duplicates = count(elements.begin(), elements.end(), temp);
         test->remove(temp);
-        ASSERT(!test->find(temp), "There is a problem with the remove or find");
+        ASSERT(test->find(temp) == (duplicates > 0), "There is a problem with the remove or find");
     }
+
+    cout << "elements from vector: " << endl;
+    for(int i = 0; i < elements.size(); ++i) {
+        cout << elements[i] << " " << endl;
+    }
+    cout << "elements from tree: " << endl;
+    test->traverseInOrder();
 
     ASSERT(elements.size() == test->size(), "There is a problem with the remove or size");
 
     auto it = test->begin();
     for (int j = 0; j < elements.size() && it != test->end(); ++j) {
-        ASSERT(elements.at(j) == *it, "There is a problem with the iterator (++)");
+        T x = elements.at(j);
+        it.printStack();
+        ASSERT(x == *it, "There is a problem with the iterator (++)");
         ++it;
     }
-
+    cout << "elements from tree: " << endl;
+    test->traverseInOrder();
+    it.printStack();
     for (int j = elements.size() - 1; j >= 0; --j) {
+        T x = elements.at(j);
         --it;
         ASSERT(elements.at(j) == *it, "There is a problem with the iterator (--)");
     }

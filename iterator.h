@@ -2,39 +2,113 @@
 #define ITERATOR_H
 
 #include "node.h"
+#include "bstree.h"
+#include <stack>
 
-template <typename T> 
+template <typename T>
 class Iterator {
     private:
         Node<T> *current;
-
+        stack<Node<T>* > s;
+        BSTree<T> *tree;
     public:
-        Iterator() {
-            // TODO
-        }
+        Iterator(): current(0), tree(0) {}
 
-        Iterator(Node<T> *node) {
-            // TODO
+        Iterator(Node<T> *node): current(node) {
+            if(!this->current) return;
+            else {
+                this->tree = current->tree;
+                this->tree->tracePath(node,s);
+            }
         }
 
         Iterator<T>& operator=(const Iterator<T> &other) {          
-            // TODO
+            this->current = other.current;
+            this->clearStack();
+            this->tree->tracePath();
+            this->tree = this->current->tree;
+            return *this;
+        }
+
+        void clearStack() {
+            while(!this->s.empty()) this->s.pop();
         }
 
         bool operator!=(Iterator<T> other) {
-            // TODO
+            return this->current != other.current;
+        }
+
+        void printStack() {
+            cout << "printing stack" << endl;
+            stack<Node<T>*> tmp = this->s;
+            while(!tmp.empty()) {
+                cout << tmp.top()->data << " ";
+                tmp.pop();
+            }
+            cout << endl;
         }
 
         Iterator<T>& operator++() {
-            // TODO
+            if(!this->current) throw runtime_error(string("Trying to access invalid address."));
+            if(this->current->right) {
+                this->s.push(this->current);
+                this->current = this->current->right;
+                this->tree->treeMinimum(this->current,this->s);
+            }
+            else {
+                if(this->s.empty()) {
+                    this->s.push(this->current);
+                    this->current = nullptr;
+                }
+                else {
+                    Node<T>* tmp(this->current);
+                    while(!this->s.empty() && this->s.top()->left != this->current) {
+                        this->current = this->s.top();
+                        this->s.pop();
+                    }
+                    if(this->s.empty()) {
+                        this->tree->tracePath(tmp,s);
+                        this->s.push(tmp);
+                        this->current = nullptr;
+                    }
+                    else {
+                        this->current = this->s.top();
+                        s.pop();
+                    }
+                }
+            }
+            return *this;
         }
 
         Iterator<T>& operator--() {
-            // TODO
+            Node<T>* min = this->tree->treeMinimum();
+            if(this->current == min) throw runtime_error(string("Trying to access invalid address."));
+            if(!this->current) {
+                if(this->s.empty()) throw runtime_error(string("Trying to access invalid address."));
+                else {
+                    this->current = this->s.top();
+                    this->s.pop();
+                }
+            }
+            else if(this->current->left) {
+                this->s.push(this->current);
+                this->current = this->current->left;
+                this->tree->treeMaximum(this->current,this->s);
+            }
+            else {
+                while(!this->s.empty() && this->s.top()->right != this->current) {
+                    this->current = this->s.top();
+                    this->s.pop();
+                }
+                this->current = this->s.top();
+                this->s.pop();
+            }
+            return *this;
         }
 
         T operator*() {
-            // TODO
+            if(!this->current) throw runtime_error(string("Trying to access invalid address."));
+            return this->current->data;
         }
 };
 
