@@ -67,8 +67,8 @@ class BSTree {
             Node<T> **z(0), **y(0), *x(0);
             if(!this->findNode(data,z)) return false;
             if((*z)->left && (*z)->right) {
-                this->treeMinimum((*z)->right,y);
-                if((*y)->right) x = (*y)->right;
+                this->treeMaximum((*z)->left,y);
+                if((*y)->left) x = (*y)->left;
                 (*z)->data = (*y)->data;
                 if(x) {
                     (*y)->data = x->data;
@@ -114,17 +114,22 @@ class BSTree {
             while(node && (*node)->left) node = &(*node)->left;
         }
 
+        void treeMaximum(Node<T> *&x, Node<T>**& node) {
+            node = &x;
+            while(node && (*node)->right) node = &(*node)->right;
+        }
+
         void treeMinimum(Node<T> *&x, stack<Node<T>* > &s) {
-            if(x && x->left) {
+            while(x && x->left) {
+                s.push(x);
                 x = x->left;
-                if(x->left) s.push(x);
             }
         }
 
-        void treeMaximum(Node<T> *&x, stack<Node<T>* > &s) {
-            if(x && x->right) {
+        void treeMaximum(Node<T> *&x, stack<Node<T>*> &s) {
+            while(x && x->right) {
+                s.push(x);
                 x = x->right;
-                if(x->right) s.push(x);
             }
         }
 

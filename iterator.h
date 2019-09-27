@@ -9,9 +9,9 @@ template <typename T>
 class Iterator {
     private:
         Node<T> *current;
-        stack<Node<T>* > s;
         BSTree<T> *tree;
     public:
+        stack<Node<T>* > s;
         Iterator(): current(0), tree(0) {}
 
         Iterator(Node<T> *node): current(node) {
@@ -42,7 +42,7 @@ class Iterator {
             cout << "printing stack" << endl;
             stack<Node<T>*> tmp = this->s;
             while(!tmp.empty()) {
-                cout << tmp.top()->data << " ";
+                cout << tmp.top() << " " << tmp.top()->data << " ";
                 tmp.pop();
             }
             cout << endl;
@@ -67,13 +67,14 @@ class Iterator {
                         this->s.pop();
                     }
                     if(this->s.empty()) {
-                        this->tree->tracePath(tmp,s);
-                        this->s.push(tmp);
+                        this->current = tmp;
+                        this->tree->tracePath(this->current,s);
+                        this->s.push(this->current);
                         this->current = nullptr;
                     }
                     else {
                         this->current = this->s.top();
-                        s.pop();
+                        this->s.pop();
                     }
                 }
             }
@@ -81,8 +82,6 @@ class Iterator {
         }
 
         Iterator<T>& operator--() {
-            Node<T>* min = this->tree->treeMinimum();
-            if(this->current == min) throw runtime_error(string("Trying to access invalid address."));
             if(!this->current) {
                 if(this->s.empty()) throw runtime_error(string("Trying to access invalid address."));
                 else {
@@ -96,12 +95,19 @@ class Iterator {
                 this->tree->treeMaximum(this->current,this->s);
             }
             else {
+                Node<T>* tmp(this->current);
                 while(!this->s.empty() && this->s.top()->right != this->current) {
                     this->current = this->s.top();
                     this->s.pop();
                 }
-                this->current = this->s.top();
-                this->s.pop();
+                if(this->s.empty()) {
+                    this->current = tmp;
+                    throw runtime_error(string("Trying to access invalid address."));
+                }
+                else {
+                    this->current = this->s.top();
+                    this->s.pop();
+                }
             }
             return *this;
         }

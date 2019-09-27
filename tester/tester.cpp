@@ -13,6 +13,8 @@ void Tester::execute() {
 template <typename T>
 void Tester::testBSFTree(Mocker mocker, vector<T> elements) {
     BSTree<T> *test = new BSTree<T>;
+    cout << endl << endl << endl << endl;
+    cout << "NEW TEST" << endl;
     for (int j = 0; j < elements.size(); ++j) {
         test->insert(elements[j]);
         ASSERT(test->find(elements[j]), "There is a problem with the insert or find");
@@ -31,27 +33,14 @@ void Tester::testBSFTree(Mocker mocker, vector<T> elements) {
         ASSERT(test->find(temp) == (duplicates > 0), "There is a problem with the remove or find");
     }
 
-    cout << "elements from vector: " << endl;
-    for(int i = 0; i < elements.size(); ++i) {
-        cout << elements[i] << " " << endl;
-    }
-    cout << "elements from tree: " << endl;
-    test->traverseInOrder();
-
     ASSERT(elements.size() == test->size(), "There is a problem with the remove or size");
 
     auto it = test->begin();
     for (int j = 0; j < elements.size() && it != test->end(); ++j) {
-        T x = elements.at(j);
-        it.printStack();
-        ASSERT(x == *it, "There is a problem with the iterator (++)");
+        ASSERT(elements.at(j) == *it, "There is a problem with the iterator (++)");
         ++it;
     }
-    cout << "elements from tree: " << endl;
-    test->traverseInOrder();
-    it.printStack();
     for (int j = elements.size() - 1; j >= 0; --j) {
-        T x = elements.at(j);
         --it;
         ASSERT(elements.at(j) == *it, "There is a problem with the iterator (--)");
     }
