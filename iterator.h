@@ -10,8 +10,8 @@ class Iterator {
     private:
         Node<T> *current;
         BSTree<T> *tree;
-    public:
         stack<Node<T>* > s;
+    public:
         Iterator(): current(0), tree(0) {}
 
         Iterator(Node<T> *node): current(node) {

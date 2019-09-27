@@ -143,7 +143,14 @@ class BSTree {
         }
 
         size_t height() {
-            // TODO
+            return this->depth(this->root);
+        }
+
+        size_t depth(Node<T>* root) {
+            if(!root) return 0;
+            size_t leftDepth = this->depth(root->left);
+            size_t rightDepth = this->depth(root->right);
+            return 1 + leftDepth > rightDepth ? leftDepth : rightDepth;
         }
 
         void traversePreOrder() {
@@ -192,8 +199,17 @@ class BSTree {
             return ++it;
         }
 
+        void deleteTree(Node<T>* node) {
+            if(node) {
+                deleteTree(node->left);
+                deleteTree(node->right);
+                delete node;
+                node = nullptr;
+            }
+        }
+
         ~BSTree() {
-            // TODO
+            deleteTree(this->root);
         }
 };
 
